@@ -34,15 +34,13 @@ class _RegisterState extends State<Register> {
         isAdded = await FirebaseFunction()
             .saveUserDetails
           (profileImage: "",user: user, doc: newId.toString(), email:
-        email, password: pass, mode: "N"
-            "ormal",watchList: []);
+        email, password: pass, mode: "InApp",watchList: []);
       }
       else{
         isAdded = await FirebaseFunction()
             .saveUserDetails
           (profileImage: "",user: user, doc: "1", email:
-        email, password: pass, mode: "N"
-            "ormal",watchList: []);
+        email, password: pass, mode: "InApp",watchList: []);
       }
       if(isAdded!){
         ScaffoldMessenger.of(context).showSnackBar(

@@ -1,6 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/SharedPreference/sharePreference.dart';
+
+import '../movieApi/apiFunction.dart';
 
 class FirebaseFunction {
 
@@ -73,6 +76,98 @@ class FirebaseFunction {
     catch (e) {
       print("Error: $e");
       return false;
+    }
+  }
+
+  Future<void> addAndRemoveToWatchList(String watchList,String email,int
+  movieId, String
+  mode)
+  async{
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
+        (collName).where("Email",isEqualTo: email).get();
+      if(snapshot.docs.isNotEmpty){
+        String id = snapshot.docs.first.id;
+        if(watchList=="add"){
+          await FirebaseFirestore.instance.collection(collName)
+              .doc(id)
+              .update({
+            "WatchList":FieldValue.arrayUnion([
+              {
+                "MovieId":movieId,
+                "MediaType":mode,
+              }
+            ]),
+          });
+        }
+        else if(watchList=="remove"){
+          await FirebaseFirestore.instance.collection(collName)
+              .doc(id)
+              .update({
+            "WatchList":FieldValue.arrayRemove([
+              {
+                "MovieId":movieId,
+                "MediaType":mode,
+              }
+            ]),
+          });
+        }
+
+      }
+    }
+    catch (e){
+      print("Error: $e");
+    }
+  }
+
+  Future<bool> matchWatchList(String email,int movieId) async{
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
+        (collName).where("Email",isEqualTo: email).get();
+      if(snapshot.docs.isNotEmpty){
+        String id = snapshot.docs.first.id;
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection(collName).doc(id).get();
+        if(userDoc.exists){
+          List watchList = userDoc['WatchList'] ?? [];
+          if(watchList.isNotEmpty){
+            for(var doc in watchList){
+              if(doc['MovieId']==movieId){
+                return true;
+              }
+            }
+          }
+        }
+      }
+      return false;
+    }
+    catch (e){
+      print("Error: $e");
+      return false;
+    }
+  }
+
+  Future<List> fetchWatchList(String email) async{
+    List data = [];
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
+        (collName).where("Email",isEqualTo: email).get();
+      if(snapshot.docs.isNotEmpty){
+        String id = snapshot.docs.first.id;
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance
+            .collection(collName).doc(id).get();
+        if(userDoc.exists){
+          List watchList = userDoc['WatchList'] ?? [];
+          if(watchList.isNotEmpty){
+            data = watchList;
+          }
+        }
+      }
+      return data;
+    }
+    catch (e){
+      print("Error: $e");
+      return data;
     }
   }
 

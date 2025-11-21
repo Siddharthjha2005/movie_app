@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
+import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
+import 'package:movie_app/SharedPreference/sharePreference.dart';
 import 'package:movie_app/movieApi/apiFunction.dart';
 import 'package:movie_app/videoPlayer/watchNow.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -20,11 +23,13 @@ class _DetailsState extends State<Details> {
   List similarData = [];
   String trailerKey = "";
   // Uri ytLink = Uri.parse("");
+  bool isWatchList = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    fetchWatchList();
     fetchAll();
   }
 
@@ -40,6 +45,20 @@ class _DetailsState extends State<Details> {
       similarData = similar;
       trailerKey = key;
     });
+  }
+
+  Future<void> fetchWatchList() async{
+    final email = await SharePreference().getEmail();
+    final isWatch = await FirebaseFunction().matchWatchList(email!,
+        widget.data.id) ;
+    setState(() {
+      isWatchList = isWatch;
+    });
+  }
+
+  Future<void> addAndRemoveToWatchList(String watchList) async{
+    final email = await SharePreference().getEmail();
+    await FirebaseFunction().addAndRemoveToWatchList(watchList,email!, widget.data.id, widget.mode);
   }
 
   Widget castCharacter() {
@@ -153,30 +172,22 @@ class _DetailsState extends State<Details> {
                 ),
                 Positioned(
                   top: 60,
-                  right: 80,
-                  child: GestureDetector(
-                    onTap: (){
-
-                    },
-                    child: Container(
-                      padding: EdgeInsets.all(5),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.black,
-                      ),
-                      child: Icon(
-                        Icons.favorite_border_outlined,
-                        size: 25,
-                      ),
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 60,
                   right: 20,
                   child: GestureDetector(
                     onTap: (){
-
+                      setState(() {
+                        isWatchList = !isWatchList;
+                        if(isWatchList){
+                          Fluttertoast.showToast(msg: "Added to your "
+                              "watchlist!");
+                          addAndRemoveToWatchList("add");
+                        }
+                        else{
+                          Fluttertoast.showToast(msg: "Remove from your "
+                              "watchlist.",);
+                          addAndRemoveToWatchList("remove");
+                        }
+                      });
                     },
                     child: Container(
                       padding: EdgeInsets.all(5),
@@ -184,7 +195,7 @@ class _DetailsState extends State<Details> {
                         shape: BoxShape.circle,
                         color: Colors.black,
                       ),
-                      child: Icon(
+                      child: isWatchList?Icon(Icons.bookmark_add):Icon(
                         Icons.bookmark_add_outlined,
                         size: 25,
                       ),
@@ -299,9 +310,13 @@ class _DetailsState extends State<Details> {
                         // });
                         if(trailerKey.isNotEmpty){
                           // final link = Uri.parse("https://www.youtube.com/watch?v=$trailerKey");
-                          Navigator.push(context, MaterialPageRoute(builder:
+                          isWatchList = await Navigator.push(context,
+                              MaterialPageRoute(builder:
                               (context) => WatchNow(link: trailerKey, mode:
                               widget.mode, id: widget.data.id,),));
+                          setState(() {
+
+                          });
                         }
                         else{
                           ScaffoldMessenger.of(context).showSnackBar(

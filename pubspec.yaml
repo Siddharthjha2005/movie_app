@@ -45,6 +45,8 @@ dependencies:
   firebase_auth: any
   shared_preferences: any
   google_sign_in: any
+  fluttertoast: any
+  shimmer_animation: any
 
 dev_dependencies:
   flutter_test:

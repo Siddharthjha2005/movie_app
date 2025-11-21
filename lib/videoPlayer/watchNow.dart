@@ -3,6 +3,8 @@ import 'package:movie_app/details/viewMore.dart';
 import 'package:movie_app/movieApi/apiFunction.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
+import '../FirebaseFunction/firebaseFunction.dart';
+import '../SharedPreference/sharePreference.dart';
 import '../details/Details.dart';
 
 class WatchNow extends StatefulWidget {
@@ -25,11 +27,13 @@ class _WatchNowState extends State<WatchNow> {
   int? currentSeason;
   int? currentEpisode;
   Map? record;
+  bool isWatchList = false;
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    fetchWatchList();
     fetchAllData();
     final videoId = YoutubePlayer.convertUrlToId(widget.link);
     _controller = YoutubePlayerController(
@@ -39,6 +43,20 @@ class _WatchNowState extends State<WatchNow> {
         // hideControls: true,
       ),
     );
+  }
+
+  Future<void> fetchWatchList() async{
+    final email = await SharePreference().getEmail();
+    final isWatch = await FirebaseFunction().matchWatchList(email!,
+        widget.id) ;
+    setState(() {
+      isWatchList = isWatch;
+    });
+  }
+
+  Future<void> addAndRemoveToWatchList(String watchList) async{
+    final email = await SharePreference().getEmail();
+    await FirebaseFunction().addAndRemoveToWatchList(watchList,email!, widget.id, widget.mode);
   }
 
 
@@ -109,7 +127,7 @@ class _WatchNowState extends State<WatchNow> {
                     left: 0,
                     child: IconButton(
                       onPressed: (){
-                        Navigator.pop(context);
+                        Navigator.pop(context,isWatchList);
                         },
                       icon: Icon(Icons.arrow_back_outlined,color: Colors.white,),
                     ),
@@ -154,23 +172,37 @@ class _WatchNowState extends State<WatchNow> {
                           children: [
                             GestureDetector(
                               onTap: (){
-
+                                setState(() {
+                                  isWatchList = !isWatchList;
+                                  if(isWatchList){
+                                    addAndRemoveToWatchList("add");
+                                  }
+                                  else{
+                                    addAndRemoveToWatchList("remove");
+                                  }
+                                });
                               },
-                              child: Column(
+                              child: isWatchList?Column(
+                                children: [
+                                  Icon(Icons.check,size: 20,),
+                                  Text("Added",style: TextStyle(fontSize: 12),),
+                                ],
+                              ):Column(
                                 children: [
                                   Icon(Icons.add,size: 20,),
                                   Text("Watchlist",style: TextStyle(fontSize: 12),),
                                 ],
                               ),
                             ),
-                            SizedBox(width: 30,),
+                            SizedBox(width: 40,),
                             Column(
                               children: [
                                 Icon(Icons.share,size: 20,),
                                 Text("Share",style: TextStyle(fontSize: 12),),
                               ],
                             ),
-                            widget.mode=="movie"?SizedBox(width: 30,):Container(),
+                            widget.mode=="movie"?SizedBox(width: 40,)
+                                :Container(),
                             widget.mode=="movie"?Column(
                               children: [
                                 Icon(Icons.arrow_downward_outlined,size: 20,),

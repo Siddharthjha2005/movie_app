@@ -1,14 +1,11 @@
 import 'dart:ui';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
 import 'package:movie_app/GoogleLoginIn/googleLoginIn.dart';
 import 'package:movie_app/SharedPreference/sharePreference.dart';
 import 'package:movie_app/logInSignUp/register.dart';
 import 'package:movie_app/screens/navBar.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Login extends StatefulWidget {
   const Login({super.key});
@@ -23,11 +20,12 @@ class _LoginState extends State<Login> {
   var passText = TextEditingController();
   bool isHide = true;
   final _formKey = GlobalKey<FormState>();
-  bool isLoader = false;
+  bool isNormalLoader = false;
+  bool isGoogleLoader = false;
 
   Future<void> signIn(String email,String pass) async{
     setState(() {
-      isLoader = true;
+      isNormalLoader = true;
     });
     String checkLogin = await FirebaseFunction()
         .signIn(email, pass);
@@ -50,7 +48,7 @@ class _LoginState extends State<Login> {
     }
     else if (checkLogin=="unsuccessful"){
       setState(() {
-        isLoader = false;
+        isNormalLoader = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -65,7 +63,7 @@ class _LoginState extends State<Login> {
     }
     else{
       setState(() {
-        isLoader = false;
+        isNormalLoader = false;
       });
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -104,7 +102,6 @@ class _LoginState extends State<Login> {
                 filter: ImageFilter.blur(sigmaX: 10,sigmaY: 10),
                 child: Container(
                   width: MediaQuery.of(context).size.width,
-                  // height: MediaQuery.of(context).size.height/2,
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.6),
@@ -203,7 +200,7 @@ class _LoginState extends State<Login> {
                                   .symmetric(vertical: 10)),
                               backgroundColor: MaterialStateProperty.all(Colors.blue),
                             ),
-                            child: isLoader?CircularProgressIndicator(color:
+                            child: isNormalLoader?CircularProgressIndicator(color:
                             Colors.white,):Text
                               ("Log In",style: TextStyle
                               (color:
@@ -224,7 +221,13 @@ class _LoginState extends State<Login> {
                         SizedBox(height: 20,),
                         GestureDetector(
                           onTap: () async{
+                            setState(() {
+                              isGoogleLoader = true;
+                            });
                             bool isLogged = await GoogleLoginIn().login(context);
+                            setState(() {
+                              isGoogleLoader = false;
+                            });
                             if(isLogged){
                               Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavBar(),));
                             }
@@ -239,7 +242,10 @@ class _LoginState extends State<Login> {
                                 color: Colors.grey,
                               ),
                             ),
-                            child: Row(
+                            child: isGoogleLoader?Center(
+                              child: CircularProgressIndicator(color:
+                              Colors.white,),
+                            ):Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 FaIcon(FontAwesomeIcons.google),
@@ -278,6 +284,11 @@ class _LoginState extends State<Login> {
               ),
             ),
           ),
+          (isNormalLoader||isGoogleLoader)?Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.2),
+              ),
+          ):Container(),
         ],
       ),
     );

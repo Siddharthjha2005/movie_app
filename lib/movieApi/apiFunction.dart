@@ -5,15 +5,27 @@ class ApiFunction {
 
   String apiKey = "e71517aee4063b53db75fc5ed23c03ef";
 
-  Future<List> fetchData(String mode,String category) async{
+  Future<List> fetchData(String mode,dynamic categoryID) async{
     List movieData = [];
     final url = Uri.parse("https://api.themoviedb"
-        ".org/3/$mode/$category?api_key=$apiKey");
+        ".org/3/$mode/$categoryID?api_key=$apiKey");
     final response = await http.get(url);
     try{
       if(response.statusCode==200){
         final data = jsonDecode(response.body);
-        List results = data['results'];
+        // List results = [];
+        // if(categoryID.runtimeType==String){
+        //   results = data['results'] ?? [];
+        // }
+        // else{
+        //   if(data is List){
+        //     results = data;
+        //   }
+        //   else if(data is Map){
+        //     results = [data];
+        //   }
+        // }
+        List results = categoryID.runtimeType==String?data['results']:[data];
         results.map((movie){
           movieData.add(MovieData(backImage: "https://image.tmdb"
               ".org/t/p/w780${movie['backdrop_path']}", id:
@@ -24,7 +36,7 @@ class ApiFunction {
               movie['overview'], posterImage: "https://image.tmdb"
                   ".org/t/p/w500${movie['poster_path']}", releaseDate:
               mode=="movie"?movie['release_date']:movie['first_air_date'],
-              voteAverage: movie['vote_average']));
+              voteAverage: movie['vote_average'],mediaType: mode));
         }).toList();
       }
       else{

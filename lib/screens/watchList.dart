@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
+import 'package:movie_app/SharedPreference/sharePreference.dart';
+import 'package:movie_app/movieApi/apiFunction.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
+
+import '../details/Details.dart';
 
 class WatchList extends StatefulWidget {
   const WatchList({super.key});
@@ -8,6 +14,60 @@ class WatchList extends StatefulWidget {
 }
 
 class _WatchListState extends State<WatchList> {
+
+  bool isAll = true;
+  bool isMovie = false;
+  bool isTv = false;
+  List watchListData = [];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    fetchAll();
+  }
+
+  Future<void> fetchAll() async{
+    final email = await SharePreference().getEmail();
+    final watch = await FirebaseFunction().fetchWatchList(email!);
+    for(var data in watch){
+      final watchList = await ApiFunction().fetchData(data['MediaType'], data['MovieId']);
+      setState(() {
+        watchListData.add(watchList);
+      });
+    }
+  }
+
+  Widget displayWatchList(List data) {
+    return GridView.builder(
+      physics: NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      itemCount: data.length,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 0.7,
+        mainAxisSpacing: 5,
+        crossAxisSpacing: 5,
+      ),
+      itemBuilder: (context, index) {
+        return GestureDetector(
+          onTap: (){
+            Navigator.push(context, MaterialPageRoute(builder:
+                (context) => Details(data:
+            data[index][0], mode: data[index][0]
+                .mediaType)
+              ,));
+          },
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(10),
+            child: Image.network(data[index][0]
+                .posterImage,
+              fit: BoxFit.cover,),
+          ),
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +101,82 @@ class _WatchListState extends State<WatchList> {
               child: Icon(Icons.notifications_outlined),
             ),
           ],
+        ),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.symmetric(horizontal: 20),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  GestureDetector(
+                    onTap: (){
+                      setState(() {
+                        isAll = true;
+                        isMovie = false;
+                        isTv = false;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isAll?Colors.blue:Colors.grey.shade900,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Text("All",style: TextStyle(color: Colors.white),),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  GestureDetector(
+                    onTap: (){
+                      setState(() {
+                        isAll = false;
+                        isMovie = true;
+                        isTv = false;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isMovie?Colors.blue:Colors.grey.shade900,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Text("Movie",style: TextStyle(color: Colors.white),),
+                    ),
+                  ),
+                  SizedBox(width: 20,),
+                  GestureDetector(
+                    onTap: (){
+                      setState(() {
+                        isAll = false;
+                        isMovie = false;
+                        isTv = true;
+                      });
+                    },
+                    child: Container(
+                      padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+                      decoration: BoxDecoration(
+                        color: isTv?Colors.blue:Colors.grey.shade900,
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      child: Text("Tv",style: TextStyle(color: Colors.white),),
+                    ),
+                  ),
+                ],
+              ),
+              SizedBox(height: 10,),
+              watchListData.isEmpty?Center(child: Text("No movies & tv show "
+                  "in watchlist",style: TextStyle(color: Colors.white,
+                  fontSize: 16,fontWeight: FontWeight.bold),))
+                  :Shimmer(
+                duration: Duration(seconds: 3),
+                interval: Duration(seconds: 5),
+                color: Colors.white,
+                child: displayWatchList(watchListData),
+              ),
+            ],
+          ),
         ),
       ),
     );
