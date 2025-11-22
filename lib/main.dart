@@ -4,6 +4,8 @@ import 'package:movie_app/SharedPreference/sharePreference.dart';
 import 'package:movie_app/logInSignUp/login.dart';
 import 'package:movie_app/screens/navBar.dart';
 
+import 'SplashScreen/splashScreen.dart';
+
 void main() async{
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
@@ -21,7 +23,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         brightness: Brightness.dark,
       ),
-      home: Login(),
+      home: SplashScreen(),
       debugShowCheckedModeBanner: false,
     );
   }

@@ -120,6 +120,67 @@ class FirebaseFunction {
     }
   }
 
+  Future<void> addProfilePic(String email,String file) async{
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
+        (collName).where("Email",isEqualTo: email).get();
+      if(snapshot.docs.isNotEmpty){
+        String id = snapshot.docs.first.id;
+        await FirebaseFirestore.instance.collection(collName)
+            .doc(id)
+        .update({
+          "ProfileImage":file,
+        });
+      }
+    }
+    catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<String> fetchProfilePic(String email) async{
+    String file = "";
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
+        (collName).where("Email",isEqualTo: email).get();
+      if(snapshot.docs.isNotEmpty){
+        String id = snapshot.docs.first.id;
+        DocumentSnapshot userDoc = await FirebaseFirestore.instance.collection
+          (collName)
+            .doc(id)
+            .get();
+        if(userDoc.exists){
+          if(userDoc['ProfileImage'].toString().isNotEmpty){
+            file = userDoc['ProfileImage'];
+          }
+        }
+      }
+      return file;
+    }
+    catch (e) {
+      print("Error: $e");
+      return file;
+    }
+  }
+
+  Future<void> updateUserDetails(String email,String user,String pass) async{
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
+        (collName).where("Email",isEqualTo: email).get();
+      if(snapshot.docs.isNotEmpty){
+        String id = snapshot.docs.first.id;
+        await FirebaseFirestore.instance.collection
+          (collName).doc(id).update({
+          "UserName":user,
+          "Password":pass,
+        });
+      }
+    }
+    catch (e) {
+      print("Error: $e");
+    }
+  }
+
   Future<bool> matchWatchList(String email,int movieId) async{
     try{
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
@@ -147,7 +208,7 @@ class FirebaseFunction {
     }
   }
 
-  Future<List> fetchWatchList(String email) async{
+  Future<List> fetchWatchList(String email,String type) async{
     List data = [];
     try{
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
@@ -159,7 +220,23 @@ class FirebaseFunction {
         if(userDoc.exists){
           List watchList = userDoc['WatchList'] ?? [];
           if(watchList.isNotEmpty){
-            data = watchList;
+            if(type=="all"){
+              data = watchList;
+            }
+            else if(type=="movie"){
+              for(var doc in watchList){
+                if(doc['MediaType']==type){
+                  data.add(doc);
+                }
+              }
+            }
+            else if(type=="tv"){
+              for(var doc in watchList){
+                if(doc['MediaType']==type){
+                  data.add(doc);
+                }
+              }
+            }
           }
         }
       }

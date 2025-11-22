@@ -380,8 +380,8 @@ class MovieData {
   String posterImage;
   String releaseDate;
   double voteAverage;
-  String? mediaType;
+  String mediaType;
   MovieData({required this.backImage,required this.id,required this.title,
     required this.overView,required this.posterImage,required this
-        .releaseDate,required this.voteAverage, this.mediaType});
+        .releaseDate,required this.voteAverage, required this.mediaType});
 }

@@ -257,6 +257,11 @@ class _RegisterState extends State<Register> {
               ),
             ),
           ),
+          isLoader?Positioned.fill(
+            child: Container(
+              color: Colors.black.withOpacity(0.2),
+            ),
+          ):Container(),
         ],
       ),
     );

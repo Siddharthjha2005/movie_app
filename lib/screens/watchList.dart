@@ -24,12 +24,12 @@ class _WatchListState extends State<WatchList> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    fetchAll();
+    fetchAll("all");
   }
 
-  Future<void> fetchAll() async{
+  Future<void> fetchAll(String type) async{
     final email = await SharePreference().getEmail();
-    final watch = await FirebaseFunction().fetchWatchList(email!);
+    final watch = await FirebaseFunction().fetchWatchList(email!,type);
     for(var data in watch){
       final watchList = await ApiFunction().fetchData(data['MediaType'], data['MovieId']);
       setState(() {
@@ -51,12 +51,26 @@ class _WatchListState extends State<WatchList> {
       ),
       itemBuilder: (context, index) {
         return GestureDetector(
-          onTap: (){
-            Navigator.push(context, MaterialPageRoute(builder:
+          onTap: () async{
+            bool isWatch = await Navigator.push(context, MaterialPageRoute(builder:
                 (context) => Details(data:
             data[index][0], mode: data[index][0]
                 .mediaType)
               ,));
+            if(!isWatch) {
+              setState(() {
+                watchListData.clear();
+                if(isAll){
+                  fetchAll("all");
+                }
+                else if(isMovie){
+                  fetchAll("movie");
+                }
+                else if(isTv){
+                  fetchAll("tv");
+                }
+              });
+            }
           },
           child: ClipRRect(
             borderRadius: BorderRadius.circular(10),
@@ -113,9 +127,11 @@ class _WatchListState extends State<WatchList> {
                   GestureDetector(
                     onTap: (){
                       setState(() {
+                        watchListData.clear();
                         isAll = true;
                         isMovie = false;
                         isTv = false;
+                        fetchAll("all");
                       });
                     },
                     child: Container(
@@ -131,9 +147,11 @@ class _WatchListState extends State<WatchList> {
                   GestureDetector(
                     onTap: (){
                       setState(() {
+                        watchListData.clear();
                         isAll = false;
                         isMovie = true;
                         isTv = false;
+                        fetchAll("movie");
                       });
                     },
                     child: Container(
@@ -149,9 +167,11 @@ class _WatchListState extends State<WatchList> {
                   GestureDetector(
                     onTap: (){
                       setState(() {
+                        watchListData.clear();
                         isAll = false;
                         isMovie = false;
                         isTv = true;
+                        fetchAll("tv");
                       });
                     },
                     child: Container(
@@ -166,15 +186,25 @@ class _WatchListState extends State<WatchList> {
                 ],
               ),
               SizedBox(height: 10,),
-              watchListData.isEmpty?Center(child: Text("No movies & tv show "
-                  "in watchlist",style: TextStyle(color: Colors.white,
-                  fontSize: 16,fontWeight: FontWeight.bold),))
-                  :Shimmer(
-                duration: Duration(seconds: 3),
-                interval: Duration(seconds: 5),
+              watchListData.isEmpty?Shimmer(
                 color: Colors.white,
-                child: displayWatchList(watchListData),
-              ),
+                child: GridView.builder(
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  itemCount: 6,
+                    gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 2,
+                      crossAxisSpacing: 5,
+                      mainAxisSpacing: 5,
+                      childAspectRatio: 0.7,
+                    ),
+                    itemBuilder: (context, index) {
+                      return Container(
+                        color: Colors.grey.shade900,
+                      );
+                    },
+                ),
+              ):displayWatchList(watchListData),
             ],
           ),
         ),

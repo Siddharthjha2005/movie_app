@@ -6,7 +6,8 @@ import 'package:movie_app/screens/search.dart';
 import 'package:movie_app/screens/watchList.dart';
 
 class NavBar extends StatefulWidget {
-  const NavBar({super.key});
+  int? pageNo;
+  NavBar({super.key,this.pageNo});
 
   @override
   State<NavBar> createState() => _NavBarState();
@@ -19,6 +20,17 @@ class _NavBarState extends State<NavBar> {
 
   List<IconData> icons = [Icons.home_outlined,Icons.search_outlined,Icons
       .bookmark_add_outlined,Icons.account_circle_outlined];
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    if(widget.pageNo!=null){
+      setState(() {
+        pageIndex = widget.pageNo!;
+      });
+    }
+  }
 
 
   @override

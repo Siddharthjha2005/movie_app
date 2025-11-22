@@ -155,7 +155,7 @@ class _DetailsState extends State<Details> {
                   left: 20,
                   child: GestureDetector(
                     onTap: (){
-                      Navigator.pop(context);
+                      Navigator.pop(context,isWatchList);
                     },
                     child: Container(
                       padding: EdgeInsets.all(5),

@@ -1,5 +1,6 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
+import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
 import 'package:movie_app/SharedPreference/sharePreference.dart';
 import 'package:movie_app/details/Details.dart';
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
@@ -30,6 +31,7 @@ class _HomeState extends State<Home> {
 
   //Data
   String userName = "";
+  String profileImage = "";
 
   @override
   void initState() {
@@ -42,11 +44,16 @@ class _HomeState extends State<Home> {
 
   Future<void> fetchLocalData() async{
     String? user = await SharePreference().getUserName();
+    String? email = await SharePreference().getEmail();
     if(user!=null){
       setState(() {
         userName = user;
       });
     }
+    final profile = await FirebaseFunction().fetchProfilePic(email!);
+    setState(() {
+      profileImage = profile;
+    });
   }
 
   Future<void> fetchAllMovie() async{
@@ -84,9 +91,13 @@ class _HomeState extends State<Home> {
   Widget header() {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: CircleAvatar(
+      leading: profileImage.isNotEmpty?CircleAvatar(
         radius: 25,
-        backgroundImage: AssetImage("assets/images/person.jpg"),
+        backgroundImage: NetworkImage(profileImage),
+      ):CircleAvatar(
+        radius: 25,
+        backgroundColor: Colors.grey.shade900,
+        child: Icon(Icons.image_not_supported),
       ),
       title: Text("Welcome, Back",style: TextStyle(color: Colors.grey),),
       subtitle: Text(userName,style: TextStyle(fontWeight: FontWeight

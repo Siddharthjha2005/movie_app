@@ -17,6 +17,11 @@ class SharePreference {
     await pref.setString("Email",email);
   }
 
+  Future<void> setPass(String pass) async{
+    final pref = await SharedPreferences.getInstance();
+    await pref.setString("Password",pass);
+  }
+
   Future<String?> getUserName() async{
     final pref = await SharedPreferences.getInstance();
     return pref.getString("UserName");
@@ -27,9 +32,24 @@ class SharePreference {
     return pref.getString("Email");
   }
 
+  Future<String?> getPass() async{
+    final pref = await SharedPreferences.getInstance();
+    return pref.getString("Password");
+  }
+
   Future<bool?> getLoginStatus() async{
     final pref = await SharedPreferences.getInstance();
     return pref.getBool("isLoggedIn");
+  }
+
+  Future<void> removeUserName() async{
+    final pref = await SharedPreferences.getInstance();
+    pref.remove("UserName");
+  }
+
+  Future<void> removePass() async{
+    final pref = await SharedPreferences.getInstance();
+    pref.remove("Password");
   }
 
   Future<void> allClear() async{

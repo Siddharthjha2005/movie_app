@@ -18,7 +18,8 @@ class GoogleLoginIn {
       }
 
       final email = user.email;
-      final displayName = user.displayName;
+      final displayName = await FirebaseFunction().fetchUserName(email)
+          ==""?user.displayName:await FirebaseFunction().fetchUserName(email);
 
       final GoogleSignInAuthentication userAuth = user.authentication;
 

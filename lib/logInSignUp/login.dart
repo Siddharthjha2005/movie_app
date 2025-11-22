@@ -44,6 +44,7 @@ class _LoginState extends State<Login> {
       await SharePreference().setLogInState(true);
       await SharePreference().setUserName(userName);
       await SharePreference().setEmail(email);
+      await SharePreference().setPass(pass);
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavBar(),));
     }
     else if (checkLogin=="unsuccessful"){
