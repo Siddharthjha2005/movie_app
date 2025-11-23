@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/details/Details.dart';
 import 'package:movie_app/movieApi/apiFunction.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 
 class Search extends StatefulWidget {
   const Search({super.key});
@@ -55,7 +56,25 @@ class _SearchState extends State<Search> {
           Text(title,style: TextStyle(fontSize: 18,fontWeight:
           FontWeight.bold),),
           SizedBox(height: 20,),
-          data.isEmpty?Center(child: CircularProgressIndicator()):GridView
+          data.isEmpty?Shimmer(
+            color: Colors.white,
+            child: GridView.builder(
+              physics: NeverScrollableScrollPhysics(),
+              shrinkWrap: true,
+              itemCount: 6,
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 5,
+                mainAxisSpacing: 5,
+                childAspectRatio: 0.7,
+              ),
+              itemBuilder: (context, index) {
+                return Container(
+                  color: Colors.grey.shade900,
+                );
+              },
+            ),
+          ):GridView
               .builder(
             physics: NeverScrollableScrollPhysics(),
             shrinkWrap: true,
@@ -84,7 +103,7 @@ class _SearchState extends State<Search> {
               );
             },
           ),
-          SizedBox(height: 60,),
+          SizedBox(height: 80,),
         ],
       ),
     );
@@ -95,6 +114,7 @@ class _SearchState extends State<Search> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         surfaceTintColor: Colors.transparent,
         title: TextField(

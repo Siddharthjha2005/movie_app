@@ -4,6 +4,7 @@ import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
 import 'package:movie_app/SharedPreference/sharePreference.dart';
 import 'package:movie_app/details/Details.dart';
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 import '../movieApi/apiFunction.dart';
 
 class Home extends StatefulWidget {
@@ -114,9 +115,30 @@ class _HomeState extends State<Home> {
   }
 
   Widget slideShow(List data,String mode) {
-    return data.isEmpty?Center(child:
-    CircularProgressIndicator())
-        :CarouselSlider.builder(
+    return data.isEmpty?Shimmer(
+      color: Colors.white,
+      child: SizedBox(
+        height: 180,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: 4,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Container(
+                width: MediaQuery.of(context).size.width/3,
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade900,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    ):CarouselSlider.builder(
       itemCount: data.length,
       itemBuilder: (context, index, realIndex) {
         return GestureDetector(
@@ -142,10 +164,30 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Widget movieList(List data,String mode) {
-    return data.isEmpty?Center(child: CircularProgressIndicator()):SizedBox(
+  Widget recordList(List data,String mode) {
+    return SizedBox(
       height: 180,
-      child: ListView.builder(
+      child: data.isEmpty?Shimmer(
+        color: Colors.white,
+        child: ListView.builder(
+          shrinkWrap: true,
+          itemCount: 4,
+          scrollDirection: Axis.horizontal,
+          itemBuilder: (context, index) {
+            return Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: Container(
+                width: MediaQuery.of(context).size.width/3,
+                height: MediaQuery.of(context).size.height,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade900,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+            );
+          },
+        ),
+      ):ListView.builder(
         shrinkWrap: true,
         itemCount: data.length,
         scrollDirection: Axis.horizontal,
@@ -185,27 +227,27 @@ class _HomeState extends State<Home> {
             FontWeight
                 .bold),),
             SizedBox(height: 10,),
-            movieList(topRatedMovieData,"movie"),
+            recordList(topRatedMovieData,"movie"),
 
             SizedBox(height: 10,),
             Text("Latest Releases",style: TextStyle(fontSize: 18,fontWeight:
             FontWeight
                 .bold),),
             SizedBox(height: 10,),
-            movieList(upComingMovieData,"movie"),
+            recordList(upComingMovieData,"movie"),
 
             SizedBox(height: 10,),
             Text("Trending Now",style: TextStyle(fontSize: 18,fontWeight:
             FontWeight
                 .bold),),
             SizedBox(height: 10,),
-            movieList(trendingMovieData,"movie"),
+            recordList(trendingMovieData,"movie"),
 
             SizedBox(height: 10,),
             Text("Popular",style: TextStyle(fontSize: 18,fontWeight:
             FontWeight.bold),),
             SizedBox(height: 10,),
-            movieList(popularMovieData,"movie"),
+            recordList(popularMovieData,"movie"),
             SizedBox(height: 80,),
           ],
         ),
@@ -228,27 +270,27 @@ class _HomeState extends State<Home> {
             FontWeight
                 .bold),),
             SizedBox(height: 10,),
-            movieList(topRatedTvData,"tv"),
+            recordList(topRatedTvData,"tv"),
 
             SizedBox(height: 10,),
             Text("Trending Now",style: TextStyle(fontSize: 18,fontWeight:
             FontWeight
                 .bold),),
             SizedBox(height: 10,),
-            movieList(trendingTvData,"tv"),
+            recordList(trendingTvData,"tv"),
 
             SizedBox(height: 10,),
             Text("On The Air",style: TextStyle(fontSize: 18,fontWeight:
             FontWeight
                 .bold),),
             SizedBox(height: 10,),
-            movieList(onTheAirTvData,"tv"),
+            recordList(onTheAirTvData,"tv"),
 
             SizedBox(height: 10,),
             Text("Popular",style: TextStyle(fontSize: 18,fontWeight:
             FontWeight.bold),),
             SizedBox(height: 10,),
-            movieList(popularTvData,"tv"),
+            recordList(popularTvData,"tv"),
             SizedBox(height: 80,),
           ],
         ),
@@ -263,6 +305,7 @@ class _HomeState extends State<Home> {
       child: Scaffold(
         backgroundColor: Colors.black,
         appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: Colors.black,
           surfaceTintColor: Colors.transparent,
           title: header(),

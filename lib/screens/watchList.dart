@@ -28,6 +28,7 @@ class _WatchListState extends State<WatchList> {
   }
 
   Future<void> fetchAll(String type) async{
+    watchListData.clear();
     final email = await SharePreference().getEmail();
     final watch = await FirebaseFunction().fetchWatchList(email!,type);
     for(var data in watch){
@@ -40,8 +41,6 @@ class _WatchListState extends State<WatchList> {
 
   Widget displayWatchList(List data) {
     return GridView.builder(
-      physics: NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
       itemCount: data.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -88,6 +87,7 @@ class _WatchListState extends State<WatchList> {
     return Scaffold(
       backgroundColor: Colors.black,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.black,
         surfaceTintColor: Colors.transparent,
         title: Row(
@@ -117,80 +117,81 @@ class _WatchListState extends State<WatchList> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            children: [
-              Row(
-                children: [
-                  GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        watchListData.clear();
-                        isAll = true;
-                        isMovie = false;
-                        isTv = false;
-                        fetchAll("all");
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isAll?Colors.blue:Colors.grey.shade900,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Text("All",style: TextStyle(color: Colors.white),),
+      body: Container(
+        padding: EdgeInsets.symmetric(horizontal: 20),
+        child: Column(
+          children: [
+            Row(
+              children: [
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      watchListData.clear();
+                      isAll = true;
+                      isMovie = false;
+                      isTv = false;
+                      fetchAll("all");
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isAll?Colors.blue:Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    child: Text("All",style: TextStyle(color: Colors.white,
+                        fontWeight: FontWeight.bold),),
                   ),
-                  SizedBox(width: 20,),
-                  GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        watchListData.clear();
-                        isAll = false;
-                        isMovie = true;
-                        isTv = false;
-                        fetchAll("movie");
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isMovie?Colors.blue:Colors.grey.shade900,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Text("Movie",style: TextStyle(color: Colors.white),),
+                ),
+                SizedBox(width: 20,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      watchListData.clear();
+                      isAll = false;
+                      isMovie = true;
+                      isTv = false;
+                      fetchAll("movie");
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isMovie?Colors.blue:Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    child: Text("Movie",style: TextStyle(color: Colors.white,
+                        fontWeight: FontWeight.bold),),
                   ),
-                  SizedBox(width: 20,),
-                  GestureDetector(
-                    onTap: (){
-                      setState(() {
-                        watchListData.clear();
-                        isAll = false;
-                        isMovie = false;
-                        isTv = true;
-                        fetchAll("tv");
-                      });
-                    },
-                    child: Container(
-                      padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
-                      decoration: BoxDecoration(
-                        color: isTv?Colors.blue:Colors.grey.shade900,
-                        borderRadius: BorderRadius.circular(15),
-                      ),
-                      child: Text("Tv",style: TextStyle(color: Colors.white),),
+                ),
+                SizedBox(width: 20,),
+                GestureDetector(
+                  onTap: (){
+                    setState(() {
+                      watchListData.clear();
+                      isAll = false;
+                      isMovie = false;
+                      isTv = true;
+                      fetchAll("tv");
+                    });
+                  },
+                  child: Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20,vertical: 8),
+                    decoration: BoxDecoration(
+                      color: isTv?Colors.blue:Colors.grey.shade900,
+                      borderRadius: BorderRadius.circular(15),
                     ),
+                    child: Text("Tv",style: TextStyle(color: Colors.white,
+                        fontWeight: FontWeight.bold),),
                   ),
-                ],
-              ),
-              SizedBox(height: 10,),
-              watchListData.isEmpty?Shimmer(
+                ),
+              ],
+            ),
+            SizedBox(height: 10,),
+            Expanded(
+              child: watchListData.isEmpty?Shimmer(
                 color: Colors.white,
                 child: GridView.builder(
-                  shrinkWrap: true,
-                  physics: NeverScrollableScrollPhysics(),
                   itemCount: 6,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -205,8 +206,9 @@ class _WatchListState extends State<WatchList> {
                     },
                 ),
               ):displayWatchList(watchListData),
-            ],
-          ),
+            ),
+            SizedBox(height: 80,),
+          ],
         ),
       ),
     );
