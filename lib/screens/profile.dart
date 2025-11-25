@@ -35,6 +35,7 @@ class _ProfileState extends State<Profile> {
   String email = "";
   final ImagePicker _picker = ImagePicker();
   String profilePic = "";
+  bool isLoader = false;
 
   @override
   void initState() {
@@ -54,13 +55,16 @@ class _ProfileState extends State<Profile> {
     }
     String? profile = await FirebaseFunction().fetchProfilePic(email);
     setState(() {
-      profilePic = profile;
+      profilePic = profile ?? "";
     });
   }
 
   Future<void> pickImage() async{
     XFile? pickImg = await _picker.pickImage(source: ImageSource.gallery);
     if(pickImg!=null){
+      setState(() {
+        isLoader = true;
+      });
       File selectImage = File(pickImg.path);
       String filePath = selectImage.path;
       final cid = await PinataService().uploadImage(filePath);
@@ -68,6 +72,7 @@ class _ProfileState extends State<Profile> {
       await FirebaseFunction().addProfilePic(email, downloadUrl);
       setState(() {
         profilePic = downloadUrl;
+        isLoader = false;
       });
     }
   }
@@ -158,26 +163,37 @@ class _ProfileState extends State<Profile> {
       ),
       body: Container(
         padding: EdgeInsets.only(right: 10,left: 10),
-        child: Column(
+        child: ListView(
           children: [
             SizedBox(height: 50,),
             GestureDetector(
-              onTap: (){
+              onTap:isLoader?null:(){
                 pickImage();
               },
               child: Stack(
                 children: [
-                  profilePic.isNotEmpty?CircleAvatar(
-                    radius: 60,
-                    backgroundImage: NetworkImage(profilePic),
-                  ):CircleAvatar(
-                    radius: 60,
-                    backgroundColor: Colors.grey.shade900,
-                    child: Icon(Icons.image_not_supported),
+                  Align(
+                    alignment: Alignment.center,
+                    child: isLoader?Container(
+                      width: 140,
+                      height: 140,
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade900,
+                        shape: BoxShape.circle,
+                      ),
+                        child: Center(child: CircularProgressIndicator(color: Colors.white,)))
+                        :CircleAvatar(
+                      radius: 70,
+                      backgroundColor: Colors.grey.shade900,
+                      backgroundImage: profilePic.isNotEmpty?NetworkImage
+                        (profilePic):null,
+                      child: profilePic.isEmpty?Icon(Icons
+                          .image_not_supported,size: 35,):null,
+                    ),
                   ),
                   Positioned(
-                    bottom: 5,
-                    right: 5,
+                    bottom: 10,
+                    right: MediaQuery.of(context).size.width/2 - 80,
                     child: Container(
                       padding: EdgeInsets.all(2),
                       decoration: BoxDecoration(
@@ -191,10 +207,17 @@ class _ProfileState extends State<Profile> {
               ),
             ),
             SizedBox(height: 20,),
-            Text(userName,style: TextStyle(fontSize: 24,fontWeight:
-            FontWeight.bold),),
+            Align(
+              alignment: Alignment.center,
+              child: Text(userName,style: TextStyle(fontSize: 24,fontWeight:
+              FontWeight.bold),),
+            ),
             SizedBox(height: 5,),
-            Text(email,style: TextStyle(color: Colors.grey,fontSize: 16),),
+            Align(
+              alignment: Alignment.center,
+                child: Text(email,style: TextStyle(color: Colors.grey,
+                    fontSize: 16),),
+            ),
             SizedBox(height: 10,),
             // Container(
             //   padding: EdgeInsets.symmetric(horizontal: 10,vertical: 5),
@@ -225,12 +248,14 @@ class _ProfileState extends State<Profile> {
                   child: ListTile(
                     onTap: () async{
                       if(data[index].title=="Edit Profile"){
-                        userName = await Navigator.push(context,
+                        final newName = await Navigator.push(context,
                             MaterialPageRoute(builder:
                             (context) => EditProfile(),));
-                        setState(() {
-
-                        });
+                        if(newName!=null){
+                          setState(() {
+                            userName = newName;
+                          });
+                        }
                       }
                       else if(data[index].title=="My Watchlist"){
                         Navigator.pushReplacement(context,
@@ -261,6 +286,7 @@ class _ProfileState extends State<Profile> {
                 );
               },
             ),
+            SizedBox(height: 100,),
           ],
         ),
       ),

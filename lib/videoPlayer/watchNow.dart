@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:movie_app/details/viewMore.dart';
 import 'package:movie_app/movieApi/apiFunction.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:shimmer_animation/shimmer_animation.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 
 import '../FirebaseFunction/firebaseFunction.dart';
@@ -195,11 +197,18 @@ class _WatchNowState extends State<WatchNow> {
                               ),
                             ),
                             SizedBox(width: 40,),
-                            Column(
-                              children: [
-                                Icon(Icons.share,size: 20,),
-                                Text("Share",style: TextStyle(fontSize: 12),),
-                              ],
+                            GestureDetector(
+                              onTap: (){
+                                final url = "https://www.youtube"
+                                ".com/watch?v=${widget.link}";
+                                Share.share(url);
+                              },
+                              child: Column(
+                                children: [
+                                  Icon(Icons.share,size: 20,),
+                                  Text("Share",style: TextStyle(fontSize: 12),),
+                                ],
+                              ),
                             ),
                             widget.mode=="movie"?SizedBox(width: 40,)
                                 :Container(),
@@ -236,6 +245,7 @@ class _WatchNowState extends State<WatchNow> {
                                           children: seasonData.asMap().entries.map((entry){
                                             int index = entry.key;
                                             return ListView.builder(
+                                              padding: EdgeInsets.zero,
                                               physics: NeverScrollableScrollPhysics(),
                                               itemCount: episodeData[index]
                                                   .length,
@@ -382,7 +392,27 @@ class _WatchNowState extends State<WatchNow> {
                         SizedBox(height: 10,),
                         Text("More Like This",style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
                         SizedBox(height: 10,),
-                        similarData.isNotEmpty?GridView.builder(
+                        similarData.isEmpty?Shimmer(
+                          color: Colors.white,
+                          child: GridView.builder(
+                            padding: EdgeInsets.zero,
+                            physics: NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: 9,
+                            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 3,
+                              crossAxisSpacing: 5,
+                              mainAxisSpacing: 5,
+                              childAspectRatio: 0.7,
+                            ),
+                            itemBuilder: (context, index) {
+                              return Container(
+                                color: Colors.grey.shade900,
+                              );
+                            },
+                          ),
+                        ):GridView.builder(
+                          padding: EdgeInsets.zero,
                           physics: NeverScrollableScrollPhysics(),
                           shrinkWrap: true,
                           itemCount: similarData.length,
@@ -409,7 +439,7 @@ class _WatchNowState extends State<WatchNow> {
                               ),
                             );
                           },
-                        ):Center(child: CircularProgressIndicator()),
+                        ),
                       ],
                     ),
                   ),

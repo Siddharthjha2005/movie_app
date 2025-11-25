@@ -24,6 +24,7 @@ class _DetailsState extends State<Details> {
   String trailerKey = "";
   // Uri ytLink = Uri.parse("");
   bool isWatchList = false;
+  List available = [];
 
   @override
   void initState() {
@@ -39,11 +40,14 @@ class _DetailsState extends State<Details> {
     final similar = await ApiFunction().fetchSimilar(widget.mode,widget.data.id);
     final key = await ApiFunction().fetchTrailerKey(widget.mode, widget.data
         .id,0,0);
+    final record = await ApiFunction().watchProvider(widget.mode,widget.data
+        .id);
     setState(() {
       genres = genre;
       character = cast;
       similarData = similar;
       trailerKey = key;
+      available = record;
     });
   }
 
@@ -133,6 +137,39 @@ class _DetailsState extends State<Details> {
           );
         },
       ),
+    );
+  }
+  
+  Widget watchProvider() {
+    return available.isEmpty?Align(
+      alignment: Alignment.center,
+        child: Text("Currently not available on any platform",style:
+        TextStyle(color: Colors.grey),),)
+        :ListView
+        .separated(
+      shrinkWrap: true,
+      physics: NeverScrollableScrollPhysics(),
+      padding: EdgeInsets.zero,
+      itemCount: available.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            onTap: () async{
+              await launchUrl(Uri.parse(available[index].link));
+            },
+            contentPadding: EdgeInsets.zero,
+            leading: ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: Image.network(available[index].image),
+            ),
+            title: Text(available[index].name),
+            trailing: Icon(Icons.keyboard_arrow_right_outlined),
+          );
+        },
+        separatorBuilder: (context, index) {
+          return SizedBox(
+            height: 20,
+          );
+        },
     );
   }
 
@@ -348,6 +385,7 @@ class _DetailsState extends State<Details> {
                       fontWeight: FontWeight.bold),),
                   SizedBox(height: 10,),
                   // similar(),
+                  watchProvider(),
                 ],
               ),
             ),

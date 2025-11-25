@@ -344,7 +344,55 @@ class ApiFunction {
     }
   }
 
+  Future<List> watchProvider(String mode,int id) async{
+    List available = [];
+    final url = Uri.parse("https://api.themoviedb"
+        ".org/3/$mode/$id/watch/providers?api_key"
+        "=$apiKey");
+    final response = await http.get(url);
+    try{
+      if(response.statusCode==200){
+        final data = jsonDecode(response.body);
+        final results = data['results'];
+        final india = results['IN'];
+        if(india != null && india['flatrate'] != null){
+          for (var provider in india['flatrate']) {
+            available.add(
+              Available(
+                image: "https://image.tmdb.org/t/p/w185${provider['logo_path']}",
+                name: provider['provider_name'],
+                link: india['link'],
+              ),
+            );
+          }
+        }
+        final us = results['US'];
+        if(us != null && us['flatrate'] != null){
+          for (var provider in us['flatrate']) {
+            available.add(
+              Available(
+                image: "https://image.tmdb.org/t/p/w185${provider['logo_path']}",
+                name: provider['provider_name'],
+                link: us['link'],
+              ),
+            );
+          }
+        }
+      }
+      return available;
+    }
+    catch (e){
+      print("Error: $e");
+      return available;
+    }
+  }
+}
 
+class Available{
+  String image;
+  String name;
+  String link;
+  Available({required this.image,required this.name,required this.link});
 }
 
 class Episode{

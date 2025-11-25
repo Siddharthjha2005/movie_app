@@ -6,6 +6,7 @@ import 'package:movie_app/details/Details.dart';
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
 import 'package:shimmer_animation/shimmer_animation.dart';
 import '../movieApi/apiFunction.dart';
+import 'navBar.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -92,17 +93,32 @@ class _HomeState extends State<Home> {
   Widget header() {
     return ListTile(
       contentPadding: EdgeInsets.zero,
-      leading: profileImage.isNotEmpty?CircleAvatar(
-        radius: 25,
-        backgroundImage: NetworkImage(profileImage),
-      ):CircleAvatar(
-        radius: 25,
-        backgroundColor: Colors.grey.shade900,
-        child: Icon(Icons.image_not_supported),
+      leading: GestureDetector(
+        onTap: (){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavBar(pageNo: 3,),));
+        },
+        child: profileImage.isNotEmpty?CircleAvatar(
+          radius: 25,
+          backgroundImage: NetworkImage(profileImage),
+        ):CircleAvatar(
+          radius: 25,
+          backgroundColor: Colors.grey.shade900,
+          child: Icon(Icons.image_not_supported),
+        ),
       ),
-      title: Text("Welcome, Back",style: TextStyle(color: Colors.grey),),
-      subtitle: Text(userName,style: TextStyle(fontWeight: FontWeight
-          .bold,fontSize: 18),),
+      title: GestureDetector(
+        onTap: (){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavBar(pageNo: 3,),));
+        },
+          child: Text("Welcome, Back",style: TextStyle(color: Colors.grey),),
+      ),
+      subtitle: GestureDetector(
+        onTap: (){
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => NavBar(pageNo: 3,),));
+        },
+        child: Text(userName,style: TextStyle(fontWeight: FontWeight
+            .bold,fontSize: 18),),
+      ),
       trailing: Container(
         padding: EdgeInsets.all(10),
         decoration: BoxDecoration(
@@ -120,6 +136,7 @@ class _HomeState extends State<Home> {
       child: SizedBox(
         height: 180,
         child: ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: 4,
           scrollDirection: Axis.horizontal,
@@ -170,6 +187,7 @@ class _HomeState extends State<Home> {
       child: data.isEmpty?Shimmer(
         color: Colors.white,
         child: ListView.builder(
+          physics: NeverScrollableScrollPhysics(),
           shrinkWrap: true,
           itemCount: 4,
           scrollDirection: Axis.horizontal,

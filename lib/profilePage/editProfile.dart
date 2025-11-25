@@ -112,37 +112,37 @@ class _EditProfileState extends State<EditProfile> {
                   ),
                 ),
                 SizedBox(height: 40,),
-                passText.text!=""?TextFormField(
-                  controller: passText,
-                  validator: (value) {
-                    if(value!.length<6){
-                      return "Password should be at least 6 characters";
-                    }
-                    return null;
-                  },
-                  obscureText: isHide,
-                  decoration: InputDecoration(
-                    contentPadding: EdgeInsets.symmetric(horizontal:
-                    20,vertical: 15),
-                    suffixIcon: IconButton(
-                      onPressed: () {
-                        setState(() {
-                          isHide = !isHide;
-                        });
-                      },
-                      icon: isHide?
-                      Icon(Icons
-                          .visibility_off_outlined):Icon(Icons.visibility_outlined),
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                    hintText: "Password",
-                    hintStyle: TextStyle(color: Colors.white),
-                    label: Text("Password"),
-                  ),
-                ):Container(),
-                passText.text!=""?SizedBox(height: 40,):Container(),
+                // passText.text!=""?TextFormField(
+                //   controller: passText,
+                //   validator: (value) {
+                //     if(value!.length<6){
+                //       return "Password should be at least 6 characters";
+                //     }
+                //     return null;
+                //   },
+                //   obscureText: isHide,
+                //   decoration: InputDecoration(
+                //     contentPadding: EdgeInsets.symmetric(horizontal:
+                //     20,vertical: 15),
+                //     suffixIcon: IconButton(
+                //       onPressed: () {
+                //         setState(() {
+                //           isHide = !isHide;
+                //         });
+                //       },
+                //       icon: isHide?
+                //       Icon(Icons
+                //           .visibility_off_outlined):Icon(Icons.visibility_outlined),
+                //     ),
+                //     border: OutlineInputBorder(
+                //       borderRadius: BorderRadius.circular(30),
+                //     ),
+                //     hintText: "Password",
+                //     hintStyle: TextStyle(color: Colors.white),
+                //     label: Text("Password"),
+                //   ),
+                // ):Container(),
+                // passText.text!=""?SizedBox(height: 40,):Container(),
                 SizedBox(
                   width: MediaQuery.of(context).size.width,
                   child: ElevatedButton(
@@ -151,8 +151,8 @@ class _EditProfileState extends State<EditProfile> {
                         setState(() {
                           isLoader = true;
                         });
-                        await FirebaseFunction().updateUserDetails(emailText
-                            .text, userText.text,passText.text);
+                        await FirebaseFunction().updateUserName(emailText
+                            .text, userText.text);
                         await SharePreference().removeUserName();
                         await SharePreference().removePass();
                         await SharePreference().setUserName(userText.text);

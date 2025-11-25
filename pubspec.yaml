@@ -49,20 +49,13 @@ dependencies:
   shimmer_animation: any
   image_picker: any
   flutter_launcher_icons: any
-  flutter_native_splash: any
+  share_plus: any
+  animated_splash_screen: any
 
 flutter_launcher_icons:
   android: true
   ios: true
   image_path: "assets/images/tmdb_logo.png"
-
-flutter_native_splash:
-  color_dark: "#000000"
-  image_dark: assets/images/tmdb_logo.png
-  icon_background_color_dark: "#ffffff"
-  android: true
-  ios: true
-  web: true
 
 dev_dependencies:
   flutter_test:

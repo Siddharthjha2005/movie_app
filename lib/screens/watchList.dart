@@ -19,6 +19,7 @@ class _WatchListState extends State<WatchList> {
   bool isMovie = false;
   bool isTv = false;
   List watchListData = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -28,15 +29,27 @@ class _WatchListState extends State<WatchList> {
   }
 
   Future<void> fetchAll(String type) async{
-    watchListData.clear();
+    if(isLoading){
+      return;
+    }
+    setState(() {
+      isLoading = true;
+      watchListData.clear();
+    });
+
     final email = await SharePreference().getEmail();
     final watch = await FirebaseFunction().fetchWatchList(email!,type);
+
+    List temp = [];
     for(var data in watch){
       final watchList = await ApiFunction().fetchData(data['MediaType'], data['MovieId']);
-      setState(() {
-        watchListData.add(watchList);
-      });
+      temp.add(watchList);
     }
+
+    setState(() {
+      watchListData = temp;
+      isLoading = false;
+    });
   }
 
   Widget displayWatchList(List data) {
@@ -124,7 +137,7 @@ class _WatchListState extends State<WatchList> {
             Row(
               children: [
                 GestureDetector(
-                  onTap: (){
+                  onTap: isLoading?null:(){
                     setState(() {
                       watchListData.clear();
                       isAll = true;
@@ -145,7 +158,7 @@ class _WatchListState extends State<WatchList> {
                 ),
                 SizedBox(width: 20,),
                 GestureDetector(
-                  onTap: (){
+                  onTap: isLoading?null:(){
                     setState(() {
                       watchListData.clear();
                       isAll = false;
@@ -166,7 +179,7 @@ class _WatchListState extends State<WatchList> {
                 ),
                 SizedBox(width: 20,),
                 GestureDetector(
-                  onTap: (){
+                  onTap: isLoading?null:(){
                     setState(() {
                       watchListData.clear();
                       isAll = false;
@@ -189,9 +202,10 @@ class _WatchListState extends State<WatchList> {
             ),
             SizedBox(height: 10,),
             Expanded(
-              child: watchListData.isEmpty?Shimmer(
+              child: isLoading?Shimmer(
                 color: Colors.white,
                 child: GridView.builder(
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: 6,
                     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -204,6 +218,27 @@ class _WatchListState extends State<WatchList> {
                         color: Colors.grey.shade900,
                       );
                     },
+                ),
+              ):(watchListData.isEmpty && isAll)
+                  ? Center(
+                child: Text(
+                  "No movies or TV shows added to Watchlist",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ):(watchListData.isEmpty && isMovie)
+                  ? Center(
+                child: Text(
+                  "No movies added to Watchlist",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ):(watchListData.isEmpty && isTv)
+                  ? Center(
+                child: Text(
+                  "No TV shows added to Watchlist",
+                  style: TextStyle(color: Colors.white70, fontSize: 16),
+                  textAlign: TextAlign.center,
                 ),
               ):displayWatchList(watchListData),
             ),

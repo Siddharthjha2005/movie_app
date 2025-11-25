@@ -9,6 +9,18 @@ class FirebaseFunction {
 
   String collName = "UserDetails";
 
+  Future<bool> sendResetLink(String email) async{
+    try{
+      await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      return true;
+    }
+    catch (e){
+      print("Error: $e");
+      return false;
+    }
+
+  }
+
   Future<String> signUp(String email,String password) async{
     try{
       UserCredential  userCredential= await FirebaseAuth.instance
@@ -163,7 +175,7 @@ class FirebaseFunction {
     }
   }
 
-  Future<void> updateUserDetails(String email,String user,String pass) async{
+  Future<void> updateUserName(String email,String user) async{
     try{
       QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
         (collName).where("Email",isEqualTo: email).get();
@@ -172,6 +184,22 @@ class FirebaseFunction {
         await FirebaseFirestore.instance.collection
           (collName).doc(id).update({
           "UserName":user,
+        });
+      }
+    }
+    catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<void> updateUserPassword(String email,String pass) async{
+    try{
+      QuerySnapshot snapshot = await FirebaseFirestore.instance.collection
+        (collName).where("Email",isEqualTo: email).get();
+      if(snapshot.docs.isNotEmpty){
+        String id = snapshot.docs.first.id;
+        await FirebaseFirestore.instance.collection
+          (collName).doc(id).update({
           "Password":pass,
         });
       }

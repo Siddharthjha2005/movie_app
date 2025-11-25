@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
 import 'package:movie_app/GoogleLoginIn/googleLoginIn.dart';
 import 'package:movie_app/SharedPreference/sharePreference.dart';
+import 'package:movie_app/logInSignUp/forgotPassword.dart';
 import 'package:movie_app/logInSignUp/register.dart';
 import 'package:movie_app/screens/navBar.dart';
 
@@ -30,6 +31,7 @@ class _LoginState extends State<Login> {
     String checkLogin = await FirebaseFunction()
         .signIn(email, pass);
     if(checkLogin=="success"){
+      await FirebaseFunction().updateUserPassword(email, pass);
       String userName = await FirebaseFunction().fetchUserName(email);
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -178,7 +180,7 @@ class _LoginState extends State<Login> {
                         SizedBox(height: 10,),
                         GestureDetector(
                           onTap: (){
-
+                            Navigator.push(context, MaterialPageRoute(builder: (context) => ForgotPassword(),));
                           },
                           child: Align(
                             alignment: Alignment.topRight,
