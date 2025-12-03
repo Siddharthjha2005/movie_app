@@ -51,6 +51,9 @@ dependencies:
   flutter_launcher_icons: any
   share_plus: any
   animated_splash_screen: any
+  firebase_messaging: any
+  flutter_local_notifications: any
+  app_settings: any
 
 flutter_launcher_icons:
   android: true

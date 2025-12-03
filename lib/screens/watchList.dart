@@ -54,6 +54,7 @@ class _WatchListState extends State<WatchList> {
 
   Widget displayWatchList(List data) {
     return GridView.builder(
+      padding: EdgeInsets.only(bottom: 80),
       itemCount: data.length,
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
@@ -242,7 +243,6 @@ class _WatchListState extends State<WatchList> {
                 ),
               ):displayWatchList(watchListData),
             ),
-            SizedBox(height: 80,),
           ],
         ),
       ),

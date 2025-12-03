@@ -46,15 +46,15 @@ class _NavBarState extends State<NavBar> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(40),
                 child: BackdropFilter(
-                  filter: ImageFilter.blur(sigmaX: 15,sigmaY: 15),
+                  filter: ImageFilter.blur(sigmaX: 5,sigmaY: 5),
                   child: Container(
                     height: 70,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: Colors.white.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(40),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
-                        width: 1,
+                        color: Colors.white.withOpacity(0.25),
+                        width: 0.8,
                       ),
                       boxShadow: [
                         BoxShadow(

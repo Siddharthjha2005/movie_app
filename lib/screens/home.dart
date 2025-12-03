@@ -1,6 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
+import 'package:movie_app/Notification/notificationServices.dart';
 import 'package:movie_app/SharedPreference/sharePreference.dart';
 import 'package:movie_app/details/Details.dart';
 import 'package:animated_segmented_tab_control/animated_segmented_tab_control.dart';
@@ -35,13 +36,25 @@ class _HomeState extends State<Home> {
   String userName = "";
   String profileImage = "";
 
+  // Notification
+  final notificationServices = NotificationServices();
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
+    notification();
     fetchAllMovie();
     fetchAllTv();
     fetchLocalData();
+  }
+
+  void notification() {
+    notificationServices.requestNotificationPermission();
+    notificationServices.firebaseInit(context);
+    notificationServices.getToken().then((value){
+      print("Display name: $value");
+    });
   }
 
   Future<void> fetchLocalData() async{

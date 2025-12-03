@@ -2,8 +2,10 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:movie_app/FirebaseFunction/firebaseFunction.dart';
+import 'package:movie_app/ShareApp/shareAppLink.dart';
 import 'package:movie_app/SharedPreference/sharePreference.dart';
 import 'package:movie_app/logInSignUp/login.dart';
 import 'package:movie_app/logInSignUp/register.dart';
@@ -160,6 +162,18 @@ class _ProfileState extends State<Profile> {
         // ),
         title: Text("Profile",style: TextStyle(fontWeight: FontWeight.bold),),
         centerTitle: true,
+        actionsPadding: EdgeInsets.only(right: 5),
+        actions: [
+          IconButton(
+              onPressed: () async{
+                bool isShare = await ShareAppLink().shareApp();
+                if(isShare){
+                  Fluttertoast.showToast(msg: "Thanks for sharing our app!");
+                }
+              },
+              icon: Icon(Icons.share),
+          ),
+        ],
       ),
       body: Container(
         padding: EdgeInsets.only(right: 10,left: 10),
